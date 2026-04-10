@@ -1,20 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Resume Result</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Analysis Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
-<body style="text-align:center; margin-top:100px; font-family:Arial, Helvetica, sans-serif; background-color:hwb(69 56% 41%);">
+<body>
+    <div class="container">
+        <h1>📊 Resume Analysis Results</h1>
 
-    <div style="background:white; padding:30px; width: 700px; margin:auto; border: 20px solid #ccc;">
-        
-        <h2 style="width: auto;font-style: initial;font-size:35px;">Resume Analysis</h2>
+        {% if error %}
+            <div class="error-message">
+                <strong>Error:</strong> {{ error }}
+            </div>
+            <a href="/" class="back-button">← Back</a>
+        {% else %}
+            <!-- Score Section -->
+            <div class="score-display">
+                <div class="score-label">Your Resume Score</div>
+                <div class="score-number">{{ score }}</div>
+                <div class="score-label">/100</div>
+            </div>
+                
 
-        <p><b>Skills Found:</b> {{ skills }}</p>
+            <!-- Status Message -->
+            <div class="message">{{ message }}</div>
 
-        <h3 style="color: green;">Score: {{ score }}/100</h3>
+            <!-- Summary Section -->
+            {% if summary %}
+            <div class="result-card summary">
+                <div class="result-label">📝 Summary</div>
+                <ul>
+                    {% for line in suggestions.split('\n') %}
+                        {% if line.strip() %}
+                        <li>{{ line }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
 
+            <!-- Skills Section -->
+            {% if skills %}
+            <div class="result-card skills">
+                <div class="result-label">💡 Skills Found</div>
+                <div class="skills-container">
+                    {% for skill in skills.split(',') %}
+                        {% if skill.strip() %}
+                        <span class="skill-tag">{{ skill.strip() }}</span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Suggestions Section -->
+            {% if suggestions %}
+            <div class="result-card suggestions">
+                <div class="result-label">💬 Suggestions for Improvement</div>
+                <div class="result-value">{{ suggestions }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Back Button -->
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="/" class="back-button">← Analyze Another Resume</a>
+            </div>
+        {% endif %}
     </div>
-
 </body>
 </html>
