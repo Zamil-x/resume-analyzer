@@ -1,24 +1,23 @@
-from urllib import response
-
 from flask import Flask, render_template, request
-import os
-import re
 import pdfplumber
 from PyPDF2 import PdfReader
 from docx import Document
 from openai import OpenAI
-
-
+import re
 
 app = Flask(__name__)
 
-# 🔑 SET YOUR GEMINI API KEY HERE
+# -------------------------------
+# OPENROUTER CLIENT
+# -------------------------------
 client = OpenAI(
-    base_url="https://integrate.api.nvidia.com/v1",
-    api_key="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"
+    base_url="https://openrouter.ai/api/v1",
+    api_key="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"
 )
-# ---------- FILE TEXT EXTRACTION ----------
 
+# -------------------------------
+# FILE TEXT EXTRACTION
+# -------------------------------
 def extract_text_from_pdf(file):
     try:
         with pdfplumber.open(file) as pdf:
@@ -42,8 +41,9 @@ def extract_text_from_docx(file):
     return text
 
 
-# ---------- ROUTES ----------
-
+# -------------------------------
+# ROUTES
+# -------------------------------
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -51,42 +51,34 @@ def home():
 
 @app.route("/upload", methods=["POST"])
 def upload():
-    file = request.files['resume']
+    file = request.files.get("resume")
 
     if not file:
         return render_template("result.html", error="No file uploaded.")
 
     filename = file.filename.lower()
 
-    if filename.endswith('.pdf'):
+    if filename.endswith(".pdf"):
         text = extract_text_from_pdf(file)
-    elif filename.endswith('.docx'):
+    elif filename.endswith(".docx"):
         text = extract_text_from_docx(file)
     else:
         return render_template("result.html", error="Upload PDF or DOCX only.")
 
-    text = text.lower()
-
-    # fallback skills
-    skills_list = ["python", "java", "c", "html", "css", "javascript", "sql"]
-    found_skills = [s for s in skills_list if s in text]
-
-    # default values
-    summary = ""
-    ai_skills = ""
-    suggestions = ""
-    score = 0
-    message = "Analysis complete"
+    skills_list = [
+        "python", "java", "c", "c++", "html", "css",
+        "javascript", "sql", "mysql", "flask", "django"
+    ]
+    found_skills = [skill for skill in skills_list if skill.lower() in text.lower()]
 
     try:
-        # 🔥 STRONG PROMPT
         prompt = f"""
-You are a professional resume analyzer.
+You are a professional ATS resume analyzer.
 
-Analyze the resume and return output EXACTLY in this format:
+Analyze the resume and return EXACTLY in this format:
 
 SUMMARY:
-Write 2-3 sentence professional overview of the candidate's profile only.
+Write 2-3 sentence professional overview of the candidate.
 
 SCORE:
 Give a score out of 100.
@@ -102,78 +94,64 @@ Resume:
 """
 
         response = client.chat.completions.create(
-    model="deepseek-ai/deepseek-v3.2",
-    messages=[
-        {"role": "user", "content": prompt}
-    ],
-    temperature=1,
-    top_p=0.95,
-    max_tokens=8192
-)
+            model="nvidia/nemotron-3-super-120b-a12b:free",
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
 
-        ai_analysis = response.choices[0].message.content
+        ai_analysis = response.choices[0].message.content.strip()
 
-       
         print("AI RESPONSE:\n", ai_analysis)
 
-        if not ai_analysis:
-            raise Exception("Empty AI response")
-
-        # ---------- PARSING ----------
-
+        # -------------------------------
+        # PARSING
+        # -------------------------------
         try:
             summary = ai_analysis.split("SUMMARY:")[1].split("SCORE:")[0].strip()
         except:
-            summary = "No summary found"
+            summary = "No summary found."
 
         try:
-            score_match = re.search(r'SCORE:\s*(\d+)', ai_analysis)
-            if score_match:
-                score = int(score_match.group(1))
+            score_match = re.search(r"SCORE:\s*(\d+)", ai_analysis)
+            score = int(score_match.group(1)) if score_match else 50
         except:
-            score = 0
+            score = 50
 
         try:
             ai_skills = ai_analysis.split("SKILLS:")[1].split("SUGGESTIONS:")[0].strip()
-            ai_skills = ai_skills.replace("\n", ", ").strip().strip(',')
+            ai_skills = ai_skills.replace("\n", ", ").strip().strip(",")
         except:
-            ai_skills = ', '.join(found_skills)
+            ai_skills = ", ".join(found_skills)
 
         try:
             suggestions = ai_analysis.split("SUGGESTIONS:")[1].strip()
         except:
-            suggestions = "No suggestions found"
+            suggestions = "No suggestions found."
 
-        message = "AI Analysis complete 🚀"
+        message = "AI Analysis Complete 🚀"
 
     except Exception as e:
         print("FULL ERROR:", e)
 
-        error_text = str(e)
+        summary = "AI failed to analyze resume."
+        ai_skills = ", ".join(found_skills)
+        suggestions = "Try improving skills and formatting."
+        score = min(len(found_skills) * 15 + 20, 100)
+        message = "Basic Analysis (AI Failed)"
 
-        if "RESOURCE_EXHAUSTED" in error_text:
-            summary = "AI quota exceeded. Please try again later."
-            ai_skills = ', '.join(found_skills)
-            suggestions = "Gemini API free tier limit reached."
-            score = min(len(found_skills) * 20, 100)
-            message = "Quota limit reached"
-
-        else:
-            summary = "AI failed to analyze resume."
-            ai_skills = ', '.join(found_skills)
-            suggestions = "Try again later."
-            score = min(len(found_skills) * 20, 100)
-            message = "AI failed"
-
-    return render_template("result.html",
-                           summary=summary,
-                           skills=ai_skills,
-                           suggestions=suggestions,
-                           score=score,
-                           message=message)
+    return render_template(
+        "result.html",
+        summary=summary,
+        skills=ai_skills,
+        suggestions=suggestions,
+        score=score,
+        message=message
+    )
 
 
-# ---------- RUN ----------
-
+# -------------------------------
+# RUN APP
+# -------------------------------
 if __name__ == "__main__":
     app.run(debug=True)
