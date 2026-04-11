@@ -81,24 +81,24 @@ def upload():
     try:
         # 🔥 STRONG PROMPT
         prompt = f"""
-Analyze this resume and return EXACTLY in this format:
+You are a professional resume analyzer.
+
+Analyze the resume and return output EXACTLY in this format:
 
 SUMMARY:
-<one paragraph>
+Write 2-3 sentence professional overview of the candidate's profile only.
 
 SCORE:
-<number>
+Give a score out of 100.
 
 SKILLS:
-<comma separated>
+List technical and soft skills comma separated.
 
 SUGGESTIONS:
-<points>
-
-Do NOT change headings.
+Give 4 bullet point improvement suggestions only.
 
 Resume:
-{text[:1500]}
+{text[:2000]}
 """
 
         response = client.chat.completions.create(
@@ -135,6 +135,7 @@ Resume:
 
         try:
             ai_skills = ai_analysis.split("SKILLS:")[1].split("SUGGESTIONS:")[0].strip()
+            ai_skills = ai_skills.replace("\n", ", ").strip().strip(',')
         except:
             ai_skills = ', '.join(found_skills)
 
