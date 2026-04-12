@@ -252,3 +252,76 @@ button:active {
         padding: 10px;
     }
 }
+/* Smooth Hover Effects for Cards */
+.result-card {
+    transition: all 0.3s ease;
+}
+
+.result-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+/* Improved Skill Tags */
+.skill-tag {
+    transition: all 0.2s ease;
+    cursor: default;
+}
+
+.skill-tag:hover {
+    background: #667eea;
+    color: white;
+    transform: scale(1.05);
+}
+
+/* Score Animation */
+.score-number {
+    animation: popIn 0.6s ease;
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Suggestions List Style */
+.result-card ul {
+    padding-left: 18px;
+    margin-top: 10px;
+}
+
+.result-card li {
+    margin-bottom: 8px;
+    color: #555;
+}
+
+/* Better Button Hover */
+.back-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102,126,234,0.3);
+}
+
+/* Glass Effect Enhancement */
+.container {
+    backdrop-filter: blur(10px);
+}
+
+/* Loading Animation (future use) */
+.loading {
+    text-align: center;
+    font-size: 18px;
+    color: #667eea;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+}

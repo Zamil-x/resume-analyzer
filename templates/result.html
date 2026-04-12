@@ -1,61 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume Analysis Results</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Resume Analysis Results</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='style.css') }}">
+
+<style>
+
+/* Score Circle */
+.score-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+}
+
+.score-inner {
+    width: 110px;
+    height: 110px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+/* Skills */
+.skills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.skill-tag {
+    background: #4CAF50;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+}
+
+/* Cards */
+.result-card {
+    background: #f9f9f9;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 10px;
+}
+
+.result-label {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Button */
+.back-button {
+    display: inline-block;
+    padding: 10px 18px;
+    background: #4CAF50;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    margin-top: 25px;
+}
+
+</style>
+
 </head>
 
 <body>
-    <div class="container">
-        <h1>📊 Resume Analysis Results</h1>
 
-        {% if error %}
-            <div class="error-message">
-                <strong>Error:</strong> {{ error }}
-            </div>
-            <a href="/" class="back-button">← Back</a>
-        {% else %}
-            <!-- Score Section -->
-            <div class="score-display">
-                <div class="score-label">Your Resume Score</div>
-                <div class="score-number">{{ score }}</div>
-                <div class="score-label">/100</div>
-            </div>
-                
+<div class="container">
 
-            <!-- Status Message -->
-            <div class="message">{{ message }}</div>
+<h1>📊 Resume Analysis Results</h1>
 
-            <!-- Skills Section -->
-            {% if skills %}
-            <div class="result-card skills">
-                <div class="result-label">💡 Skills Found</div>
-                <div class="skills-container">
-                    {% for skill in skills.split(',') %}
-                        {% if skill.strip() %}
-                        <span class="skill-tag">{{ skill.strip() }}</span>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
+{% if error %}
 
-            <!-- Suggestions Section -->
-            {% if suggestions %}
-            <div class="result-card suggestions">
-                <div class="result-label">💬 Suggestions for Improvement</div>
-                <div class="result-value">{{ suggestions }}</div>
-            </div>
-            {% endif %}
+<div class="error-message">
+<strong>Error:</strong> {{ error }}
+</div>
 
-            <!-- Back Button -->
-            <div style="text-align: center; margin-top: 30px;">
-                <a href="/" class="back-button">← Analyze Another Resume</a>
-            </div>
-        {% endif %}
-    </div>
+<a href="/" class="back-button">
+← Back
+</a>
+
+{% else %}
+
+<!-- Score Section -->
+<div style="text-align:center; margin-top:30px;">
+
+<div class="score-circle" style="--score: {{ score }};">
+<div class="score-inner">
+{{ score }}
+</div>
+</div>
+
+<p style="margin-top:10px;">
+Resume Score /100
+</p>
+
+</div>
+
+<!-- Status Message -->
+<div class="result-card">
+
+<div class="result-label">
+📌 Status
+</div>
+
+<div>
+{{ message }}
+</div>
+
+</div>
+
+<!-- Skills Section -->
+{% if skills %}
+
+<div class="result-card">
+
+<div class="result-label">
+💡 Skills Found
+</div>
+
+<div class="skills-container">
+
+{% for skill in skills.split(',') %}
+{% if skill|trim %}
+
+<span class="skill-tag">
+{{ skill|trim }}
+</span>
+
+{% endif %}
+{% endfor %}
+
+</div>
+
+</div>
+
+{% endif %}
+
+<!-- Suggestions Section -->
+{% if suggestions %}
+
+<div class="result-card">
+
+<div class="result-label">
+💬 Suggestions for Improvement
+</div>
+
+<ul>
+
+{% for line in suggestions.split('.') %}
+{% if line|trim %}
+
+<li>{{ line|trim }}</li>
+
+{% endif %}
+{% endfor %}
+
+</ul>
+
+</div>
+
+{% endif %}
+
+<!-- Back Button -->
+<div style="text-align:center;">
+
+<a href="/" class="back-button">
+← Analyze Another Resume
+</a>
+
+</div>
+
+{% endif %}
+
+</div>
+
 </body>
 </html>
+
+
 
