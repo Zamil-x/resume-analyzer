@@ -77,9 +77,6 @@ You are a professional ATS resume analyzer.
 
 Analyze the resume and return EXACTLY in this format:
 
-SUMMARY:
-Write 2-3 sentence professional overview of the candidate.
-
 SCORE:
 Give a score out of 100.
 
@@ -108,11 +105,6 @@ Resume:
         # PARSING
         # -------------------------------
         try:
-            summary = ai_analysis.split("SUMMARY:")[1].split("SCORE:")[0].strip()
-        except:
-            summary = "No summary found."
-
-        try:
             score_match = re.search(r"SCORE:\s*(\d+)", ai_analysis)
             score = int(score_match.group(1)) if score_match else 50
         except:
@@ -134,7 +126,6 @@ Resume:
     except Exception as e:
         print("FULL ERROR:", e)
 
-        summary = "AI failed to analyze resume."
         ai_skills = ", ".join(found_skills)
         suggestions = "Try improving skills and formatting."
         score = min(len(found_skills) * 15 + 20, 100)
@@ -142,7 +133,6 @@ Resume:
 
     return render_template(
         "result.html",
-        summary=summary,
         skills=ai_skills,
         suggestions=suggestions,
         score=score,

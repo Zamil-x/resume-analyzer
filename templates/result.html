@@ -28,20 +28,6 @@
             <!-- Status Message -->
             <div class="message">{{ message }}</div>
 
-            <!-- Summary Section -->
-            {% if summary %}
-            <div class="result-card summary">
-                <div class="result-label">📝 Summary</div>
-                <ul>
-                    {% for line in suggestions.split('\n') %}
-                        {% if line.strip() %}
-                        <li>{{ line }}</li>
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-            </div>
-            {% endif %}
-
             <!-- Skills Section -->
             {% if skills %}
             <div class="result-card skills">

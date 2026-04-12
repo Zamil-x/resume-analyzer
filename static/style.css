@@ -132,10 +132,6 @@ button:active {
     border-radius: 5px;
 }
 
-.result-card.summary {
-    border-left-color: #667eea;
-}
-
 .result-card.skills {
     border-left-color: #48bb78;
 }

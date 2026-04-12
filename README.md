@@ -31,7 +31,7 @@ A Flask-based web application that analyzes resumes using AI (OpenAI GPT) to pro
 ## Usage
 
 1. Upload your resume (PDF or DOCX)
-2. View the AI-generated analysis including summary, skills, score, and suggestions
+2. View the AI-generated analysis including skills, score, and suggestions
 
 ## Improvements Made
 
